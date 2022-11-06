@@ -7,4 +7,5 @@ edition = "2021"
 
 [dependencies]
 arraylist = "0.1.5"
+bitlab = "1.1.0"
 rand = "0.8.5"

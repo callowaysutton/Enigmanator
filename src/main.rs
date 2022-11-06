@@ -2,10 +2,13 @@
  * Copyright (c) 2022. Calloway Sutton
  */
 
+use std::ops::Deref;
+use arraylist::arl::ArrayList;
 #[allow(dead_code)]
 
 use crate::binary_tree::BTree;
 use rand::{thread_rng, Rng};
+use bitlab::*;
 mod binary_tree;
 
 fn read_file(path: String) -> Vec<u8> {
@@ -39,7 +42,7 @@ fn as_u64_le(array: &[u8; 8]) -> u64 {
 
 
 fn main() {
-    let mut bt: BTree<i8> = BTree::new();
+    let mut bt: BTree<u8> = BTree::new();
     let mut rng = thread_rng();
     let mut nums: [u8;8] = [0,0,0,0,0,0,0,0];
     // let data = read_file(String::from("src/encryptme.txt"));
@@ -48,8 +51,19 @@ fn main() {
     while bt.get_size() < 64 {
         bt.insert(rng.gen_range(0..64));
     }
+
+    println!("Key Used:");
     bt.print_postorder();
-    println!("");
+    let list = bt.list_postorder().unwrap();
+    println!("\n");
+
+    // Make an array of the key
+    let mut key: [u8; 64] = [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2];
+    let mut i = 0;
+    for n in list {
+        key[i] = *n;
+        i += 1;
+    }
 
     let data: Vec<u8> = String::from("shenzhen").into_bytes();
     let mut count = 0;
@@ -63,7 +77,19 @@ fn main() {
         println!("{:b} => {:} => {:}", num, num, c);
     }
 
-    println!("{:b}", as_u64_be(&nums));
+    let a = as_u64_be(&nums);
+    let mut b: u64 = 0;
+
+    println!("\nMessage: ");
+    println!("{:b}", a);
+    println!("Encrypted: ");
+    for pos in 0..64 {
+        if a.get_bit(key[pos] as u32).unwrap() {
+            b = b.set_bit(pos as u32).unwrap();
+        }
+    }
+
+    println!("{:b}", b);
     // bt.print_preorder();
 
 
